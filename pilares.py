@@ -130,6 +130,49 @@ class Pasta(Item):
             filho.mostrar()
 
 
+# HERANÇA + ENCAPSULAMENTO + POLIMORFISMO: item que aponta para outro item na árvore.
+class Atalho(Item):
+    """Representa um atalho (link) que referencia outro item da árvore de arquivos."""
+    __slots__ = ("__destino",)
+
+    def __init__(self, nome, destino, pai=None):
+        """Inicializa o atalho com seu nome, item de destino e pasta pai opcional."""
+        super().__init__(nome, pai)
+        try:
+            self.redirecionar(destino)
+        except ValueError:
+            if self.pai is not None:
+                self.pai._soltar(self)
+            raise
+
+    @property
+    def destino(self):
+        """Permite apenas a leitura do item de destino apontado pelo atalho."""
+        return self.__destino
+
+    def redirecionar(self, novo_destino):
+        """Atualiza o destino do atalho garantindo que não aponte para si ou para um ancestral."""
+        if novo_destino is self:
+            raise ValueError("atalho não pode apontar para si mesmo")
+
+        ancestral = self.pai
+        while ancestral is not None:
+            if ancestral is novo_destino:
+                raise ValueError("atalho não pode apontar para uma pasta que o contém")
+            ancestral = ancestral.pai
+
+        self.__destino = novo_destino
+
+    def tamanho(self):
+        """Retorna o tamanho fixo de 1 byte ocupado pelo atalho."""
+        return 1
+
+    def mostrar(self):
+        """Exibe o atalho formatado com recuo indicando a seta para o caminho do destino."""
+        recuo = "    " * self.profundidade()
+        print(recuo + self.nome + " -> " + self.__destino.caminho())
+
+
 # Outra classe que assina o contrato SEM ser da árvore: a Lixeira.
 class Lixeira(Medivel):
     __slots__ = ("__descartados",)
