@@ -204,3 +204,36 @@ def tentar(rotulo, acao):
         print(rotulo, "-> passou (!)")
     except Exception as erro:
         print(rotulo, "->", type(erro).__name__ + ":", erro)
+
+
+# Construção da árvore de arquivos com estrutura de usuário
+disco = Pasta("C:")
+usuarios = Pasta("Users", disco)
+usuario = Pasta("Kaua", usuarios)
+desktop = Pasta("Desktop", usuario)
+documentos = Pasta("Documentos", usuario)
+
+# Arquivos na árvore (pelo menos dois arquivos)
+anotacoes = Arquivo("anotacoes.txt", 450, desktop)
+relatorio = Arquivo("relatorio.pdf", 2800, documentos)
+
+# Atalhos na árvore (um para arquivo e um para pasta)
+atalho_arquivo = Atalho("atalho_relatorio.lnk", relatorio, desktop)
+atalho_pasta = Atalho("atalho_documentos.lnk", documentos, desktop)
+
+# 1. Mostra a árvore completa
+print("--- Árvore completa ---")
+disco.mostrar()
+
+# 2. Mede o espaço total de uma lista com um arquivo, uma pasta com atalho e uma lixeira
+lixeira = Lixeira()
+lixeira.descartar(Arquivo("antigo.log", 150))
+itens_para_medicao = [anotacoes, desktop, lixeira]
+print("\nEspaço total:", espaco_total(itens_para_medicao), "B")
+
+# 3. Três tentativas que devem falhar e imprimir o erro
+print("\n--- Tentativas que devem falhar ---")
+tentar("atalho.destino = outro item", lambda: setattr(atalho_arquivo, "destino", anotacoes))
+tentar("um atalho apontando para si mesmo", lambda: atalho_arquivo.redirecionar(atalho_arquivo))
+tentar("um atalho apontando para a pasta onde ele esta", lambda: atalho_arquivo.redirecionar(desktop))
+
